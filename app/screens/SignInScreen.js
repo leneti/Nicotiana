@@ -10,14 +10,14 @@ import {
 } from "react-native";
 import colors from "../config/colours";
 import { firebase } from "../config/firebase";
-// import { signInWithGoogleAsync as GoogleSignIn } from "../components/GoogleSignIn";
+import { signInWithGoogleAsync as GoogleSignIn } from "../components/GoogleSignIn";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import AwesomeButton from "@umangmaurya/react-native-really-awesome-button";
 import { Indicator } from "../components/LoadingIndicator";
-// import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function SignInScreen() {
   const [loading, setLoading] = useState(false);
@@ -120,7 +120,7 @@ export default function SignInScreen() {
           >
             Log in
           </AwesomeButton>
-          {/* <View
+          <View
             style={{
               flexDirection: "row",
               justifyContent: "space-evenly",
@@ -163,7 +163,7 @@ export default function SignInScreen() {
             >
               Continue with Google
             </Text>
-          </AwesomeButton> */}
+          </AwesomeButton>
         </View>
       )}
 

@@ -5,14 +5,13 @@ import {
   Image,
   StyleSheet,
   View,
-  // Modal,
   TextInput,
   Platform,
   Alert,
-  // Text,
+  Text,
 } from "react-native";
 import Svg, { G, Circle } from "react-native-svg";
-// import { signInWithGoogleAsync as GoogleSignIn } from "../components/GoogleSignIn";
+import { signInWithGoogleAsync as GoogleSignIn } from "../components/GoogleSignIn";
 import { pickImage } from "../components/ImagePicking";
 import AwesomeButton from "@umangmaurya/react-native-really-awesome-button";
 import {
@@ -22,7 +21,7 @@ import {
 import { Indicator } from "../components/LoadingIndicator";
 import { userCreated } from "../components/NewUserCreated";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { MaterialIcons /* Ionicons */ } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 
 export default function SignUpScreen() {
   const [name, setName] = useState("");
@@ -167,7 +166,7 @@ export default function SignUpScreen() {
           >
             Create an account
           </AwesomeButton>
-          {/* <View
+          <View
             style={{
               flexDirection: "row",
               justifyContent: "space-evenly",
@@ -210,7 +209,7 @@ export default function SignUpScreen() {
             >
               Continue with Google
             </Text>
-          </AwesomeButton> */}
+          </AwesomeButton>
         </View>
       )}
 
