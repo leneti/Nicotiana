@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Nicotiana",
+    "slug": "nicotiana",
+    "version": "1.10.2",
+    "orientation": "portrait",
+    "icon": "./app/assets/icon.png",
+    "splash": {
+      "image": "./app/assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#36383F"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nicotiana",
+      "buildNumber": "1.10.2"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./app/assets/iconupdated.png",
+        "backgroundColor": "#2E1E22"
+      },
+      "package": "com.nicotiana",
+      "versionCode": 102
+    },
+    "web": {
+      "favicon": "./app/assets/favicon.png"
+    },
+    "description": ""
+  }
+}
