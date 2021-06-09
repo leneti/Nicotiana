@@ -138,7 +138,10 @@ export default function BotNavigation() {
       .doc(firebase.auth().currentUser.uid)
       .get()
       .then((snap) => setUptodate(snap.data().uptodate))
-      .catch(console.log);
+      .catch((e) => {
+        console.log(e);
+        setUptodate(false);
+      });
   }, []);
 
   const Conditions = () => {
@@ -155,14 +158,13 @@ export default function BotNavigation() {
         </Text>
         <AwesomeButton
           style={{ marginTop: hp(3) }}
-          onPress={() =>
-            db
-              .collection("sensitive-info")
+          onPress={() => {
+            db.collection("sensitive-info")
               .doc(firebase.auth().currentUser.uid)
               .update({ uptodate: true })
-              .then(() => setUptodate(true))
-              .catch(console.log)
-          }
+              .catch(console.log);
+            setUptodate(true);
+          }}
           width={wp(70)}
           borderRadius={20}
           height={40}

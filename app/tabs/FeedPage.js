@@ -25,11 +25,13 @@ import VisitedUser from "../components/VisitedUser";
 import { Indicator } from "../components/LoadingIndicator";
 import AwesomeButton from "@umangmaurya/react-native-really-awesome-button";
 import { Ionicons } from "@expo/vector-icons";
+import { useSelector, useDispatch } from "react-redux";
+import { setPosts } from "../redux/actions";
 
 let nav = null;
 
 const Feed = ({ navigation }) => {
-  const limit = 9;
+  const limit = 10;
   const [documentData, setDocumentData] = useState([]);
   const [loadingView, setLoadingView] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -37,14 +39,14 @@ const Feed = ({ navigation }) => {
   const [listRefresh, setListRefresh] = useState(false);
   const [empty, setEmpty] = useState(false);
 
+  // const postsState = useSelector((state) => state.posts);
+  // const dispatch = useDispatch();
+
   useEffect(() => {
     let mounted = true;
     if (documentData.length == 0) {
-      getFeed()
-        .then(() => {
-          if (mounted) setLoadingView(false);
-        })
-        .catch(console.log);
+      getFeed();
+      if (mounted) setLoadingView(false);
     }
     return () => {
       mounted = false;
@@ -52,6 +54,11 @@ const Feed = ({ navigation }) => {
   }, [documentData]);
 
   const getFeed = async () => {
+    // if (postsState.length != 0) {
+    //   setDocumentData(postsState);
+    //   console.log("Data came from Redux");
+    //   return;
+    // }
     if (endOfList || refreshing) return;
     console.log("Retrieving Recent Posts");
     setRefreshing(true);
@@ -59,9 +66,10 @@ const Feed = ({ navigation }) => {
       .where("followers", "array-contains", firebase.auth().currentUser.uid)
       .orderBy("lastPost", "desc")
       .limit(limit)
-      .get()
-      .then((followedUsers) => {
-        const data = followedUsers.docs.map((doc) => doc.data());
+      .onSnapshot({ includeMetadataChanges: true }, (snapshot) => {
+        var source = snapshot.metadata.fromCache ? "local cache" : "server";
+        console.log("Data came from " + source);
+        const data = snapshot.docChanges().map((snap) => snap.doc.data());
         const posts = data.reduce(
           (acc, cur) => acc.concat(cur.recentPosts),
           []
@@ -76,6 +84,7 @@ const Feed = ({ navigation }) => {
           b.created > a.created ? 1 : b.created < a.created ? -1 : 0
         );
         setDocumentData(sortedPosts);
+        // dispatch(setPosts(sortedPosts));
         if (sortedPosts.length == 0) setEmpty(true);
         setRefreshing(false);
         if (sortedPosts.length < limit * 5) setEndOfList(true);
@@ -157,7 +166,7 @@ const Feed = ({ navigation }) => {
           onEndReached={() => {
             /* TO-DO: Import posts with high rep? */
           }}
-          onEndReachedThreshold={0}
+          onEndReachedThreshold={0.8}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={refreshFn} />
           }

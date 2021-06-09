@@ -139,9 +139,10 @@ exports.postUpdated = functions
       // userRef
       //   .update({ rep: increment(post.likeCount > oldData.likeCount ? 1 : -1) })
       //   .catch(console.log);
-      batch.update(userRef, {
-        rep: increment(post.likeCount > oldData.likeCount ? 1 : -1),
-      });
+      if (post.likeCount !== oldData.likeCount)
+        batch.update(userRef, {
+          rep: increment(post.likeCount > oldData.likeCount ? 1 : -1),
+        });
       batch.commit().catch(console.log);
     } catch (err) {
       console.log(err);

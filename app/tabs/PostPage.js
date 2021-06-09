@@ -1197,6 +1197,26 @@ const PostSecondScreen = ({
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(0);
   const [loadingView, setLoadingView] = useState(false);
+  const [snackAlert, setSnackAlert] = useState("");
+  let posted = false;
+
+  useEffect(() => {
+    const timeout = setTimeout(() => Posted(true), 5000);
+    return () => clearTimeout(timeout);
+  }, [loadingView]);
+
+  function Posted(timedOut) {
+    if (loadingView && !posted) {
+      Reset();
+      setLoadingView(false);
+      posted = true;
+      if (timedOut) setSnackAlert("Unstable connection. Review upload delayed");
+      setComment("");
+      setPieData([]);
+      navigation.goBack();
+      nav.navigate("Feed");
+    }
+  }
 
   useEffect(() => {
     const data = post.tobaccos.map((tobacco) => ({
@@ -1212,6 +1232,10 @@ const PostSecondScreen = ({
 
   function GoBack() {
     navigation.goBack();
+  }
+
+  function toggleSnack() {
+    setSnackAlert("");
   }
 
   function recursiveRemoval(callCount, tobaccos, tags) {
@@ -1275,14 +1299,7 @@ const PostSecondScreen = ({
           "Post was not published. Check your internet connection and try again."
         );
       })
-      .finally(() => {
-        Reset();
-        setLoadingView(false);
-        setComment("");
-        setPieData([]);
-        navigation.goBack();
-        nav.navigate("Feed");
-      });
+      .finally(() => Posted(false));
   }
 
   return (
@@ -1463,6 +1480,14 @@ const PostSecondScreen = ({
           }}
         />
       </View>
+      <Snackbar
+        visible={snackAlert !== ""}
+        onDismiss={toggleSnack}
+        duration={2000}
+        style={{ backgroundColor: colors.background_transparent }}
+      >
+        {snackAlert}
+      </Snackbar>
     </Container>
   );
 };

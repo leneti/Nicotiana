@@ -12,6 +12,7 @@
   "dependencies": {
     "@expo-google-fonts/yantramanav": "^0.1.0",
     "@expo/vector-icons": "^12.0.0",
+    "@react-native-async-storage/async-storage": "^1.13.0",
     "@react-native-community/masked-view": "0.1.10",
     "@react-native-community/slider": "3.0.3",
     "@react-navigation/bottom-tabs": "^5.10.7",
@@ -19,6 +20,7 @@
     "@react-navigation/material-top-tabs": "^5.3.13",
     "@react-navigation/native": "^5.8.0",
     "@react-navigation/stack": "^5.10.0",
+    "@reduxjs/toolkit": "^1.5.1",
     "@umangmaurya/react-native-really-awesome-button": "github:umangmaurya/react-native-really-awesome-button",
     "algoliasearch": "^4.8.4",
     "expo": "^41.0.0",
@@ -44,7 +46,11 @@
     "react-native-svg-charts": "^5.4.0",
     "react-native-tab-view": "^2.15.2",
     "react-native-view-more-text": "^2.1.0",
-    "reanimated-bottom-sheet": "^1.0.0-alpha.22"
+    "react-redux": "^7.2.4",
+    "react-redux-firebase": "^3.10.0",
+    "reanimated-bottom-sheet": "^1.0.0-alpha.22",
+    "redux-firestore": "^0.15.0",
+    "redux-persist": "^6.0.0"
   },
   "devDependencies": {
     "@testing-library/react-native": "^7.2.0",

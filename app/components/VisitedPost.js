@@ -37,6 +37,7 @@ import {
 } from "react-native-paper";
 import AwesomeButton from "@umangmaurya/react-native-really-awesome-button";
 import Slider from "@react-native-community/slider";
+import { useSelector } from "react-redux";
 
 export default function VisitedPost({
   navigation,
@@ -59,6 +60,7 @@ export default function VisitedPost({
   const [initialLiked, setInitialLiked] = useState(
     post.likedBy.includes(userID)
   );
+  const savedUsers = useSelector((state) => state.users);
 
   /* #region Rating variables */
   const [strength, setStrength] = useState(post.strength);
@@ -83,11 +85,14 @@ export default function VisitedPost({
 
   /* #region Functions */
   useEffect(() => {
-    db.collection("users")
-      .doc(post.userUid)
-      .get()
-      .then((userSnapshot) => setUser(userSnapshot.data()))
-      .catch(console.log);
+    const mUser = savedUsers.filter((user) => user.uid === post.userUid)[0];
+    if (mUser === undefined)
+      db.collection("users")
+        .doc(post.userUid)
+        .get()
+        .then((userSnapshot) => setUser(userSnapshot.data()))
+        .catch(console.log);
+    else setUser(mUser);
 
     /*
      * Random Pastel Colour generation

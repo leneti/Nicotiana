@@ -12,6 +12,8 @@ import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { PieChart } from "react-native-svg-charts";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import ViewMoreText from "react-native-view-more-text";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser } from "../redux/actions";
 
 export default function ItemSelector({ item, screen, onPress, userOnPress }) {
   const userID = firebase.auth().currentUser.uid;
@@ -23,12 +25,24 @@ export default function ItemSelector({ item, screen, onPress, userOnPress }) {
     item.likedBy.includes(userID)
   );
 
+  const dispatch = useDispatch();
+  const savedUsers = useSelector((state) => state.users);
+
   useEffect(() => {
-    db.collection("users")
-      .doc(item.userUid)
-      .get()
-      .then((userSnap) => setUser(userSnap.data()))
-      .catch(console.log);
+    const mUser = savedUsers.filter((user) => user.uid === item.userUid)[0];
+    if (mUser === undefined)
+      db.collection("users")
+        .doc(item.userUid)
+        .get()
+        .then((userSnap) => {
+          setUser(userSnap.data());
+          const { imageUrl, username, verified } = userSnap.data();
+          dispatch(
+            addUser({ uid: item.userUid, imageUrl, username, verified })
+          );
+        })
+        .catch(console.log);
+    else setUser(mUser);
 
     /*
      * Random Pastel Colour generation

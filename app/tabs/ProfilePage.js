@@ -14,7 +14,6 @@ import {
   ActivityIndicator,
   RefreshControl,
   Image,
-  Modal,
   Animated,
 } from "react-native";
 import {
@@ -31,14 +30,22 @@ import {
 import { Container, Header, Left, Right, Body } from "native-base";
 import AwesomeButton from "@umangmaurya/react-native-really-awesome-button";
 import { Snackbar } from "react-native-paper";
-import { device } from "../config/device";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  addMorePosts,
+  setUserPosts,
+  clearProfilePosts,
+  updateUser,
+} from "../redux/actions";
 
 let nav = null;
+let postsLoaded = 0;
 
 function ProfileTab({ navigation }) {
   /* #region  Variables */
   const limit = 10;
-  const delay = 5000;
+  const delay = 3000;
+  const userID = firebase.auth().currentUser.uid;
   const [documentData, setDocumentData] = useState([]);
   const [lastVisible, setLastVisible] = useState(null);
   const [loadingView, setLoadingView] = useState(true);
@@ -48,84 +55,128 @@ function ProfileTab({ navigation }) {
   const [timer, setTimer] = useState(0);
   const [visible, setVisible] = useState(false);
   const [user, setUser] = useState(null);
+
+  // const postsState = useSelector((state) => state.userPosts);
+  // const usersState = useSelector((state) => state.users);
+  // const dispatch = useDispatch();
   /* #endregion */
 
   /* #region  Functions */
   useEffect(() => {
+    let mounted = true;
     if (
       documentData.length == 0 &&
       lastVisible === null &&
       !refreshing &&
       !endOfList
-    )
-      getUserInfo().then(retrieveData).catch(console.log);
+    ) {
+      getUserInfo();
+      if (mounted) retrieveData();
+    }
+
+    return () => {
+      mounted = false;
+    };
   }, [documentData, lastVisible, refreshing, endOfList]);
 
   function getUserInfo() {
+    // if (usersState.length != 0) {
+    //   const i = usersState.findIndex((user) => user.uid === userID);
+    //   if (i != -1 && usersState[i].name !== undefined) {
+    //     setUser(usersState[i]);
+    //     setLoadingView(false);
+    //     console.log("User data came from Redux");
+    //     return;
+    //   }
+    // }
     console.log("Getting user data");
-    return new Promise((resolve, reject) => {
-      db.collection("users")
-        .doc(firebase.auth().currentUser.uid)
-        .get()
-        .then((userSnapshot) => {
-          setUser(userSnapshot.data());
-          setLoadingView(false);
-        })
-        .then(resolve)
-        .catch(reject);
-    });
+    db.collection("users")
+      .doc(userID)
+      .get()
+      .then((userSnapshot) => {
+        setUser(userSnapshot.data());
+        // dispatch(
+        //   updateUser({
+        //     uid: userID,
+        //     ...userSnapshot.data(),
+        //   })
+        // );
+        setLoadingView(false);
+      })
+      .catch(console.log);
   }
 
   function retrieveData() {
-    return new Promise((resolve, reject) => {
-      if (endOfList || refreshing) return reject("Did not retrieve data");
-      setRefreshing(true);
-      console.log("Retrieving Data");
-      db.collection("users")
-        .doc(firebase.auth().currentUser.uid)
-        .collection("posts")
-        .orderBy("created", "desc")
-        .limit(limit)
-        .get()
-        .then((docSnaps) => {
-          let documentData = docSnaps.docs.map((document) => document.data());
-          setDocumentData(documentData);
-          setLastVisible(documentData[documentData.length - 1]?.created);
-          setRefreshing(false);
-          if (documentData.length < limit) setEndOfList(true);
-        })
-        .then(resolve)
-        .catch(reject);
-    });
+    // if (postsState.length != 0) {
+    //   let posts =
+    //     postsState.length > limit
+    //       ? postsState.slice(0, limit)
+    //       : [...postsState];
+    //   postsLoaded = posts.length;
+    //   setDocumentData(posts);
+    //   setRefreshing(false);
+    //   setLastVisible(posts[posts.length - 1]?.created);
+    //   console.log("Data came from Redux");
+    //   return;
+    // }
+    if (endOfList || refreshing) return;
+    console.log("Retrieving Data");
+    setRefreshing(true);
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .collection("posts")
+      .orderBy("created", "desc")
+      .limit(limit)
+      .get()
+      .then((docSnaps) => {
+        let documentData = docSnaps.docs.map((document) => document.data());
+        setDocumentData(documentData);
+        // dispatch(setUserPosts(documentData));
+        setLastVisible(documentData[documentData.length - 1]?.created);
+        setRefreshing(false);
+        // postsLoaded = documentData.length;
+        if (documentData.length < limit) setEndOfList(true);
+        if (loadingView) setLoadingView(false);
+      })
+      .catch(console.log);
   }
 
   function retrieveMore() {
-    return new Promise((resolve, reject) => {
-      if (endOfList || refreshing) return reject("Did not retrieve extra data");
-      setRefreshing(true);
-      console.log("Retrieving additional Data");
-      db.collection("users")
-        .doc(firebase.auth().currentUser.uid)
-        .collection("posts")
-        .orderBy("created", "desc")
-        .startAfter(lastVisible)
-        .limit(limit)
-        .get()
-        .then((docSnaps) => {
-          let documentData = docSnaps.docs.map((document) => document.data());
-          if (documentData.length === 0) {
-            setEndOfList(true);
-            setRefreshing(false);
-            return resolve();
-          }
-          setDocumentData((prevData) => [...prevData, ...documentData]);
-          setLastVisible(documentData[documentData.length - 1]?.created);
+    if (endOfList || refreshing) {
+      return;
+    }
+    // if (postsState.length > postsLoaded) {
+    //   let posts = postsState.slice(postsLoaded, postsLoaded + limit);
+    //   setDocumentData((prevData) => [...prevData, ...posts]);
+    //   setLastVisible(posts[posts.length - 1]?.created);
+    //   postsLoaded += posts.length;
+    //   console.log("Extra data came from Redux");
+    //   return;
+    // }
+    console.log("Retrieving additional Data");
+    setRefreshing(true);
+    db.collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .collection("posts")
+      .orderBy("created", "desc")
+      .startAfter(lastVisible)
+      .limit(limit)
+      .get()
+      .then((docSnaps) => {
+        let documentData = docSnaps.docs.map((document) => document.data());
+        if (documentData.length === 0) {
+          setEndOfList(true);
           setRefreshing(false);
-          if (documentData.length < limit) setEndOfList(true);
-          return resolve();
-        })
-        .catch(reject);
-    });
+          return;
+        }
+        setDocumentData((prevData) => [...prevData, ...documentData]);
+        // dispatch(addMorePosts(documentData));
+        setLastVisible(documentData[documentData.length - 1]?.created);
+        setRefreshing(false);
+        // postsLoaded += documentData.length;
+        if (documentData.length < limit) setEndOfList(true);
+      })
+      .catch(console.log);
   }
 
   function selectItem(post) {
@@ -330,8 +381,8 @@ function ProfileTab({ navigation }) {
           )}
           keyExtractor={(_, index) => String(index)}
           ListFooterComponent={refreshing ? <ActivityIndicator /> : null}
-          onEndReached={() => retrieveMore().catch(console.log)}
-          onEndReachedThreshold={0}
+          onEndReached={() => retrieveMore()}
+          onEndReachedThreshold={0.8}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={refreshFn} />
           }
