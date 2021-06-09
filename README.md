@@ -13,10 +13,10 @@
 ## Development Preparation
 
 `sudo apt install curl`  
-`curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash`  
+`curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash`  
 `nvm install node`  
 `sudo apt install git`  
-`git clone https://git-teaching.cs.bham.ac.uk/mod-ug-proj-2020/dxg857.git`  
+`git clone git@github.com:leneti/Nicotiana.git`  
 `cd dxg857`  
 `sudo npm i -g expo-cli`  
 `npm install`  
